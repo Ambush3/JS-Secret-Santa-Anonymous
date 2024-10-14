@@ -1,6 +1,6 @@
 ## Clone The Repository
-git clone <repository-url>
-cd <repository-directory>
+git clone <https://github.com/Ambush3/JS-Secret-Santa-Anonymous.git>
+cd </directory/structure/to/JS-Secret-Santa-Anonymous>
 
 ## Install Dependencies
 npm install
