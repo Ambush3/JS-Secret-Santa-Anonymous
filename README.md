@@ -7,9 +7,9 @@ npm install
 
 ## Create an env file 
 ### The file should contain the following variables:
-EMAIL=your-email@example.com
-PASSWORD=your-email-password
-MODE=production  # Use 'test' for testing purposes
+- EMAIL=your-email@example.com
+- PASSWORD=your-email-password
+- MODE=production # Use 'test' for testing purposes
 
 ## Running the Script
 ### Production Mode
