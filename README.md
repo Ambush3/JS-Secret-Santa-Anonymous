@@ -47,12 +47,16 @@ node secretSantaAnonScript.js
 └── node_modules/          # Installed dependencies
 ```
 
-
 ## Output File
 After the assignments are made, a SantaAllocations.txt file will be created in the project root directory, listing each participant and their assigned recipient.
 
 - John Doe is the secret santa of Jane Smith
 - Jane Smith is the secret santa of Bob Johnson
+
+## Email Received 
+Hello John Doe,
+You are the secret santa of Jane Doe!
+Remember the budget is $50.
 
 ## Dependencies 
 - nodemailer
