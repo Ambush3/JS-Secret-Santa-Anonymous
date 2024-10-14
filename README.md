@@ -22,10 +22,9 @@ node secretSantaAnonScript.js
 #### Input Methods:
 1. Provide a participants.txt file with names and emails
 - The file should contain the names and emails in the following format:
-  John Doe, johndoe@example.com
-  Jane Doe, janedoe@example.com
-  John Smith, johnsmith@example.com
-  ...
+  - John Doe, johndoe@example.com
+  - Jane Doe, janedoe@example.com
+  - John Smith, johnsmith@example.com
 
 2. Manually enter participants
 
