@@ -36,6 +36,8 @@ Run The Script
 node secretSantaAnonScript.js
 
 ## Project Structure
+
+```
 .
 ├── .env                   # Environment variables
 ├── README.md              # This file
@@ -43,13 +45,14 @@ node secretSantaAnonScript.js
 ├── SantaAllocations.txt    # Output file for Secret Santa pairings (generated after running the script)
 ├── package.json           # Node.js dependencies
 └── node_modules/          # Installed dependencies
+```
 
 
 ## Output File
 After the assignments are made, a SantaAllocations.txt file will be created in the project root directory, listing each participant and their assigned recipient.
 
-John Doe is the secret santa of Jane Smith
-Jane Smith is the secret santa of Bob Johnson
+- John Doe is the secret santa of Jane Smith
+- Jane Smith is the secret santa of Bob Johnson
 
 ## Dependencies 
 - nodemailer
