@@ -115,6 +115,11 @@ const getParticipantInfo = async () => {
 
     // Get participant count
     let count = await askQuestion("Enter number of participants: ");
+    if (count < 2) {
+        console.log("Invalid number of participants. You can't do Secret Santa with just one person. That is silly. Please try again.");
+        process.exit();
+    }
+
     count = parseInt(count);
 
     // Option 1: File input via txt file
