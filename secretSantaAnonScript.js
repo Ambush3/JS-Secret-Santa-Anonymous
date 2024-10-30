@@ -170,8 +170,8 @@ const startSecretSanta = async () => {
         // Test mode: use hardcoded test data
         names = ['John Doe', 'Jane Smith', 'Alice Brown', 'Bob Johnson', 'Charlie Lee', 'Diana Prince', 'Eve Adams', 'Frank Wright'];
         emails = [
-            'john.doe@fakemail.com', 'jane.smith@fakemail.com', 'alice.brown@fakemail.com', 'bob.johnson@fakemail.com',
-            'charlie.lee@fakemail.com', 'diana.prince@fakemail.com', 'eve.adams@fakemail.com', 'frank.wright@fakemail.com'
+            'john.doe@localhost.com', 'jane.smith@localhost.com', 'alice.brown@localhost.com', 'bob.johnson@localhost.com',
+            'charlie.lee@localhost.com', 'diana.prince@localhost.com', 'eve.adams@localhost.com', 'frank.wright@localhost.com'
         ];
     }
 

@@ -1,4 +1,4 @@
-John Doe, fakemail.com
-Jane Doe, fakemail.com
-John Smith, fakemail.com
-Jane Smith, fakemail.com
+John Doe, localhost.com
+Jane Doe, localhost.com
+John Smith, localhost.com
+Jane Smith, localhost.com
