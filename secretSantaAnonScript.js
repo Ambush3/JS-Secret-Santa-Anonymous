@@ -81,7 +81,7 @@ const sendEmails = async (names, emails, recipients) => {
 
     for (let i = 0; i < names.length; i++) {
         const mailContent = `Hello ${names[i]},
-        \nYou are the secret santa of ${recipients[i]}!
+        \nYou are getting a gift for ${recipients[i]}!
         \nRemember the budget is $${budget}.
         `;
 
@@ -168,11 +168,12 @@ const startSecretSanta = async () => {
         await getParticipantInfo();
     } else {
         // Test mode: use hardcoded test data
-        names = ['John Doe', 'Jane Smith', 'Alice Brown', 'Bob Johnson', 'Charlie Lee', 'Diana Prince', 'Eve Adams', 'Frank Wright'];
-        emails = [
-            'john.doe@localhost.com', 'jane.smith@localhost.com', 'alice.brown@localhost.com', 'bob.johnson@localhost.com',
-            'charlie.lee@localhost.com', 'diana.prince@localhost.com', 'eve.adams@localhost.com', 'frank.wright@localhost.com'
-        ];
+        // names = ['Aaron Bush', 'Sydney Bush', 'Alice Brown', 'Bob Johnson', 'Charlie Lee', 'Diana Prince', 'Eve Adams', 'Frank Wright'];
+        // emails = [
+        //     'aaronbush3@gmail.com', 'sydney.godlover@yahoo.com', 'alice.brown@localhost.com', 'bob.johnson@localhost.com',
+        //     'charlie.lee@localhost.com', 'diana.prince@localhost.com', 'eve.adams@localhost.com', 'frank.wright@localhost.com'
+        // ];
+        await getParticipantInfo();
     }
 
     recipients = assignRecipients(names);
@@ -182,7 +183,7 @@ const startSecretSanta = async () => {
     // Write allocations to file to be read for testing purposes
     const allocations = fs.createWriteStream('SantaAllocations.txt');
     names.forEach((name, i) => {
-        allocations.write(`${name} is the secret santa of ${recipients[i]}\n`);
+        allocations.write(`${name} is gifting to ${recipients[i]}\n`);
     });
     allocations.close();
 
