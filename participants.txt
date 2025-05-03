@@ -1,4 +1,12 @@
-John Doe, localhost.com
-Jane Doe, localhost.com
-John Smith, localhost.com
-Jane Smith, localhost.com
+Dad, sdeark1@gmail.com
+Mom, Marlened@saginawmedical.com
+Kassie, horningkassandra@gmail.com
+Sydney, sydney.bush.sb@gmail.com
+Sierra, sierradeark1@gmail.com
+Josh, joshuadeark@gmail.com
+Brittany, brittany.autumn.93@gmail.com
+Robert, raclark82394@gmail.com
+Grams, dearkmarlene@gmail.com
+Aaron, aaronbush3@gmail.com
+Katie, katelynnkent08@gmail.com
+Mark, markkent777@gmail.com
