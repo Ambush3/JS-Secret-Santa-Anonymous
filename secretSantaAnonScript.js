@@ -17,15 +17,6 @@ const askQuestion = (query) => {
 
 const validateEmail = email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-const weightedRandomPick = (items) => {
-    const totalWeight = items.reduce((s, i) => s + i.weight, 0);
-    let r = Math.random() * totalWeight;
-    for (const item of items) {
-        if (r < item.weight) return item;
-        r -= item.weight;
-    }
-};
-
 const assignRecipients = (participants, maxAttempts = 1000) => {
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
         const available = [...participants];
