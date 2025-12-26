@@ -1,77 +1,78 @@
-// Load environment variables
 require('dotenv').config();
 const fs = require('fs');
 const readline = require('readline');
 const nodemailer = require('nodemailer');
 
-// Initialize variables
-let names = [];
-let emails = [];
-let recipients = [];
 const budget = 50;
 const mode = process.env.MODE || 'production';
+const participants = [];
 
-// Helper function to ask a question in the terminal
 const askQuestion = (query) => {
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    });
-
-    return new Promise(resolve => rl.question(query, (ans) => {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    return new Promise(resolve => rl.question(query, ans => {
         rl.close();
         resolve(ans);
     }));
 };
 
-// Function to validate email format
-const validateEmail = (email) => {
-    const regex = /^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$/;
-    return regex.test(email);
+const validateEmail = email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+const weightedRandomPick = (items) => {
+    const totalWeight = items.reduce((s, i) => s + i.weight, 0);
+    let r = Math.random() * totalWeight;
+    for (const item of items) {
+        if (r < item.weight) return item;
+        r -= item.weight;
+    }
 };
 
-// Secret Santa logic to assign recipients
-const assignRecipients = (names) => {
-    let possibleSantas = [...names];
-    let recipients = [];
-    let redo = false;
+const assignRecipients = (participants, maxAttempts = 1000) => {
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        const available = [...participants];
+        const assignments = [];
+        let failed = false;
 
-    for (let i = 0; i < names.length; i++) {
-        let recipientIndex = Math.floor(Math.random() * possibleSantas.length);
-        while (names[i] === possibleSantas[recipientIndex]) {
-            if (possibleSantas.length === 1) {
-                redo = true;
+        for (const santa of participants) {
+            let candidates = available.filter(
+                p => p.name !== santa.name && p.location !== santa.location
+            );
+
+            if (candidates.length === 0) {
+                candidates = available.filter(p => p.name !== santa.name);
+            }
+
+            if (candidates.length === 0) {
+                failed = true;
                 break;
             }
-            recipientIndex = Math.floor(Math.random() * possibleSantas.length);
+
+            const chosen =
+                candidates[Math.floor(Math.random() * candidates.length)];
+
+            assignments.push(chosen);
+
+            const index = available.findIndex(p => p.name === chosen.name);
+            available.splice(index, 1);
         }
-        if (!redo) {
-            recipients.push(possibleSantas[recipientIndex]);
-            possibleSantas.splice(recipientIndex, 1);
-        } else {
-            recipients = [];
-            assignRecipients(names); // Recursively reassign if we hit a deadlock
-            break;
-        }
+
+        if (!failed) return assignments;
     }
-    return recipients;
+
+    throw new Error('Unable to generate Secret Santa assignments');
 };
 
-// Email sending function using nodemailer
-const sendEmails = async (names, emails, recipients) => {
+const sendEmails = async (participants, recipients) => {
     let transporter;
 
     if (mode === 'test') {
-        console.log("Running in test mode. No real emails will be sent.");
         transporter = nodemailer.createTransport({
-            streamTransport: true, // Simulates sending email
+            streamTransport: true,
             newline: 'unix',
             buffer: true
         });
     } else {
-        console.log("Running in production mode. Real emails will be sent.");
         transporter = nodemailer.createTransport({
-            service: 'gmail',  // or 'yahoo', 'hotmail', etc.
+            service: 'gmail',
             auth: {
                 user: process.env.EMAIL,
                 pass: process.env.PASSWORD
@@ -79,121 +80,91 @@ const sendEmails = async (names, emails, recipients) => {
         });
     }
 
-    for (let i = 0; i < names.length; i++) {
-        const mailContent = `Hello ${names[i]},
-        \nYou are getting a gift for ${recipients[i]}!
-        \nRemember the budget is $${budget}.
-        `;
+    for (let i = 0; i < participants.length; i++) {
+        const santa = participants[i];
+        const recipient = recipients[i];
+        const wishlistPath = recipient.wishlist;
+
+        if (mode === 'test') {
+            console.log(`EMAIL: ${santa.name} → ${recipient.name}`);
+            console.log(`ATTACH: ${recipient.name} → ${wishlistPath}`);
+        }
 
         const mailOptions = {
             from: process.env.EMAIL,
-            to: emails[i],
+            to: santa.email,
             subject: 'Secret Santa',
-            text: mailContent
+            text: `Hello ${santa.name},
+
+You are getting a gift for ${recipient.name}!
+
+Remember the budget is $${budget}.`,
+            attachments: []
         };
 
-        try {
-            const info = await transporter.sendMail(mailOptions);
-            if (mode === 'test') {
-                console.log(`Pretend email sent to ${emails[i]}:\n`, info.message.toString());
-            } else {
-                console.log(`Real email sent to ${emails[i]}`);
-            }
-        } catch (error) {
-            console.log(`Failed to send email to ${emails[i]}: ${error}`);
+        if (wishlistPath && fs.existsSync(wishlistPath)) {
+            mailOptions.attachments.push({
+                filename: `${recipient.name}-wishlist.txt`,
+                path: wishlistPath
+            });
         }
+
+        await transporter.sendMail(mailOptions);
     }
 };
 
-// Function to get participant info in production
+
 const getParticipantInfo = async () => {
-    console.log("Welcome to the Secret Santa decision-maker!");
+    let option = parseInt(await askQuestion('How would you like to enter the information? (1 for text file, 2 for manual entry): '));
+    let count = parseInt(await askQuestion('Enter number of participants: '));
 
-    // Choose info entry method
-    let option = await askQuestion("How would you like to enter the information? (1 for text file, 2 for manual entry): ");
-    option = parseInt(option);
+    if (count < 2) process.exit();
 
-    // Get participant count
-    let count = await askQuestion("Enter number of participants: ");
-    if (count < 2) {
-        console.log("Invalid number of participants. You can't do Secret Santa with just one person. That is silly. Please try again.");
-        process.exit();
-    }
-
-    count = parseInt(count);
-
-    // Option 1: File input via txt file
     if (option === 1) {
-        const filename = await askQuestion("Enter the text file name (must end in .txt): ");
-        const fileStream = fs.createReadStream(filename);
-
+        const filename = await askQuestion('Enter the text file name (must end in .txt): ');
         const rl = readline.createInterface({
-            input: fileStream,
+            input: fs.createReadStream(filename),
             crlfDelay: Infinity
         });
 
         for await (const line of rl) {
-            const [name, email] = line.split(', ');
-            names.push(name);
-            emails.push(email);
-        }
-    }
-
-    // Option 2: Manual input
-    else if (option === 2) {
-        console.log("Please manually enter participant details:");
-
-        for (let i = 0; i < count; i++) {
-            let name = await askQuestion(`Enter the name of participant ${i + 1}: `);
-            names.push(name);
-
-            let validEmail = false;
-            while (!validEmail) {
-                let email = await askQuestion(`Enter the email of participant ${i + 1}: `);
-                if (validateEmail(email)) {
-                    emails.push(email);
-                    validEmail = true;
-                } else {
-                    console.log("Invalid email. Please try again.");
-                }
+            const [name, email, location] = line.split(',').map(s => s.trim());
+            if (!validateEmail(email)) {
+                console.error('Invalid email:', email);
+                process.exit(1);
             }
+            participants.push({ name, email, location, wishlist: `wishlists/${name}.txt` });
+        }
+    } else {
+        for (let i = 0; i < count; i++) {
+            const name = await askQuestion(`Enter name for participant ${i + 1}: `);
+            let email;
+            do {
+                email = await askQuestion(`Enter email for participant ${i + 1}: `);
+            } while (!validateEmail(email));
+            const location = await askQuestion(`Enter location for participant ${i + 1}: `);
+            participants.push({ name, email, location });
         }
     }
 };
 
-// Main function to start the script
 const startSecretSanta = async () => {
-    if (mode === 'production') {
-        // Production: ask for participant info
-        await getParticipantInfo();
-    } else {
-        // Test mode: use hardcoded test data
-        // names = ['Aaron Bush', 'Sydney Bush', 'Alice Brown', 'Bob Johnson', 'Charlie Lee', 'Diana Prince', 'Eve Adams', 'Frank Wright'];
-        // emails = [
-        //     'aaronbush3@gmail.com', 'sydney.godlover@yahoo.com', 'alice.brown@localhost.com', 'bob.johnson@localhost.com',
-        //     'charlie.lee@localhost.com', 'diana.prince@localhost.com', 'eve.adams@localhost.com', 'frank.wright@localhost.com'
-        // ];
-        await getParticipantInfo();
-    }
+    await getParticipantInfo();
 
-    recipients = assignRecipients(names);
+    console.log('Participants loaded:', participants.length);
+    
+    const recipients = assignRecipients(participants);
+    await sendEmails(participants, recipients);
 
-    await sendEmails(names, emails, recipients);
-
-    // Write allocations to file to be read for testing purposes
-    const allocations = fs.createWriteStream('SantaAllocations.txt');
-    names.forEach((name, i) => {
-        allocations.write(`${name} is gifting to ${recipients[i]}\n`);
+    const output = fs.createWriteStream('SantaAllocations.txt');
+    participants.forEach((p, i) => {
+        output.write(`${p.name} is gifting to ${recipients[i].name}\n`);
     });
-    allocations.close();
-
-    console.log('Secret Santa assignments saved to SantaAllocations.txt');
+    output.close();
 };
 
-// Only call startSecretSanta if the script is run directly
 if (require.main === module) {
     startSecretSanta();
 }
 
-// Export the functions for testing purposes in testSecretSanta.js
-module.exports = { assignRecipients, sendEmails, validateEmail };
+module.exports = { assignRecipients, validateEmail };
