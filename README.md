@@ -28,6 +28,16 @@ node secretSantaAnonScript.js
 
 2. Manually enter participants
 
+##### If input method one is selected:
+- Then enter in number of participants
+- Enter in the text file name (ex: participants.txt)
+- Emails will be sent out
+
+##### If input method two is selected:
+- Then enter in number of participants
+- Enter names and emails of each participant
+- Emails will be sent out
+
 ## Testing Mode
 Set the mode to test in the env file
 MODE=test
