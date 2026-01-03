@@ -1,3 +1,9 @@
+
+## What this Secret Santa Script Does:
+This script, once ran, will take either a txt file with the correct formatted information (Name, email, location), or manual entry. 
+Once the respective prompt is chosen and we are pointed to the correct txt file, then based on location of those part of Secret Santa, will then be chosen anonymously, with emails being sent out. 
+This script will make it so that people who live in close proximity to one another, do not have eachother for Secret Santa.
+
 ## Clone The Repository
 - git clone <https://github.com/Ambush3/JS-Secret-Santa-Anonymous.git>
 - cd </directory/structure/to/JS-Secret-Santa-Anonymous>
@@ -72,3 +78,6 @@ Remember the budget is $50.
 - nodemailer
 - dotenv
 - readline-sync
+
+## Future Enhancements
+In the future, I will be adding a prompt to ask if you want to use the filter for close proximity or not. 
